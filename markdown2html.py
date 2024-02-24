@@ -1,34 +1,54 @@
 #!/usr/bin/python3
 """
-Script to convert Markdown to HTML.
-Usage: ./markdown2html.py README.md README.html
+This is a script to convert a Markdown file to HTML.
+
+Arguments:
+    input_file: the name of the Markdown file to be converted
+    output_file: the name of the output HTML file
+
+Execute this file:
+    ./markdown2html.py README.md README.html
 """
 
-import sys
-import markdown
+import argparse
+import pathlib
+import re
 
-def convert_markdown_to_html(markdown_file, output_file):
-    """
-    Convert Markdown file to HTML.
-    """
-    try:
-        with open(markdown_file, 'r') as f:
-            markdown_content = f.read()
-    except FileNotFoundError:
-        print(f"Missing {markdown_file}", file=sys.stderr)
+
+def convert_md_to_html(input_file, output_file):
+    '''
+    Converts markdown file to HTML file
+    '''
+    # Read the contents of the input file
+    with open(input_file, encoding='utf-8') as f:
+        md_content = f.readlines()
+
+    html_content = []
+    for line in md_content:
+        # Check if the line is a heading
+        match = re.match(r'(#){1,6} (.*)', line)
+        if match:
+            h_level = len(match.group(1))
+            h_content = match.group(2)
+            html_content.append(f'<h{h_level}>{h_content}</h{h_level}>\n')
+        else:
+            html_content.append(line)
+
+    # Write the HTML content to the output file
+    with open(output_file, 'w', encoding='utf-8') as f:
+        f.writelines(html_content)
+
+
+if __name__ == '__main__':
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(description='Convert markdown to HTML')
+    parser.add_argument('input_file', help='path to input markdown file')
+    parser.add_argument('output_file', help='path to output HTML file')
+    args = parser.parse_args()
+
+    input_path = pathlib.Path(args.input_file)
+    if not input_path.is_file():
+        print(f'Missing {input_path}', file=sys.stderr)
         sys.exit(1)
 
-    html_content = markdown.markdown(markdown_content)
-
-    with open(output_file, 'w') as f:
-        f.write(html_content)
-
-if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Usage: ./markdown2html.py README.md README.html", file=sys.stderr)
-        sys.exit(1)
-
-    markdown_file = sys.argv[1]
-    output_file = sys.argv[2]
-
-    convert_markdown_to_html(markdown_file, output_file)
+    convert_md_to_html(args.input_file, args.output_file)
