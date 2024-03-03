@@ -1,14 +1,10 @@
 #!/usr/bin/python3
-"""
-This is a script to convert a Markdown file to HTML.
+''' Write a script markdown2html.py that takes an argument 2 strings:
 
-Arguments:
-    input_file: the name of the Markdown file to be converted
-    output_file: the name of the output HTML file
+    First argument is the name of the Markdown file
+    Second argument is the output file name
+'''
 
-Execute this file:
-    ./markdown2html.py README.md README.html
-"""
 import sys
 import os.path
 import re
